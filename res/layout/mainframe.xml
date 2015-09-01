@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/gridbackgroud"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top" >
+
+        <TextView
+            android:id="@+id/totalmachine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="@string/totalmachines"
+            android:textSize="18sp" />
+
+        <GridView
+            android:id="@+id/grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/totalmachine"
+            android:fadingEdge="horizontal"
+            android:horizontalSpacing="20dp"
+            android:listSelector="@android:color/background_dark"
+            android:numColumns="2"
+            android:verticalSpacing="20dp" >
+        </GridView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/bottombar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/startserver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bottombuttonbg"
+            android:gravity="center"
+            android:text="startserver" />
+
+        <TextView
+            android:id="@+id/endserver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bottombuttonbg"
+            android:gravity="center"
+            android:text="end server" />
+    </LinearLayout>
+
+</FrameLayout>
