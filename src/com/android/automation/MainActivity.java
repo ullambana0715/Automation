@@ -69,6 +69,7 @@ public class MainActivity extends Activity implements OnClickListener ,OnChartVa
 				addEntry();
 				break;
 			case DELETE_CLIENT:
+				mTotalMachines--;
 				break;
 			}
 		};
