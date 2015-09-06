@@ -18,6 +18,7 @@ import java.util.Date;
 import org.json.JSONObject;
 
 import android.os.Handler;
+import android.os.Message;
 
 public class MyServer {
 
@@ -45,8 +46,6 @@ public class MyServer {
 				SocketThread thread = new SocketThread(socket, socketID++);
 				thread.start();
 				mThreadList.add(thread);
-//				Thread.sleep(200);
-//				mHandler.sendEmptyMessage(MainActivity.MESSAGE_GET);
 			}
 
 		} catch (Exception e) {
@@ -75,16 +74,24 @@ public class MyServer {
 				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 				char[] b = new char[8];
+				String s = new String();
 				while (isStartServer) {
 					reader.read(b);
 					for (char cs : b) {
 						System.out.print(cs);
 					}
+					s = new String(b);
 					System.out.println();
-
-					Thread.sleep(100);
-					mHandler.sendEmptyMessage(MainActivity.MESSAGE_GET);
 					
+					MessageBody mb = new MessageBody();
+					mb.machineNo = s.substring(0, 2);
+					mb.dataType = s.substring(3, 4);
+					mb.data = s.substring(4, 7);
+					Thread.sleep(100);
+					Message msg = new Message();
+					msg.obj = mb;
+					msg.what = MainActivity.MESSAGE_GET;
+					mHandler.dispatchMessage(msg);
 					
 					writer.write(b);
 					writer.flush();
@@ -97,5 +104,13 @@ public class MyServer {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	class MessageBody {
+		String machineNo;
+		String dataType;
+		String runningStatus;
+		String lineCut;
+		String data;
 	}
 }
