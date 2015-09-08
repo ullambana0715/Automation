@@ -41,10 +41,10 @@ public class DynamicalAddingActivity extends DemoBase implements OnChartValueSel
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.chart);
 
-        mChart = (LineChart) findViewById(R.id.chart1);
-        mChart.setOnChartValueSelectedListener(this);
-        mChart.setDrawGridBackground(false);
-        mChart.setDescription("");
+//        mChart = (LineChart) findViewById(R.id.chart1);
+//        mChart.setOnChartValueSelectedListener(this);
+//        mChart.setDrawGridBackground(false);
+//        mChart.setDescription("");
         
         // add an empty data object
         mChart.setData(new LineData());

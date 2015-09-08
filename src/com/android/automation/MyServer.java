@@ -18,6 +18,7 @@ import java.util.Date;
 import org.json.JSONObject;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 public class MyServer {
@@ -28,9 +29,10 @@ public class MyServer {
 	private ArrayList<SocketMessage> mMsgList = new ArrayList<SocketMessage>();
 	private ArrayList<SocketThread> mThreadList = new ArrayList<SocketThread>();
 	Handler mHandler;
-
-	public MyServer(Handler hanlder) {
-		mHandler = hanlder;
+	MainActivity mActivity;
+	public MyServer(MainActivity ma) {
+//		mHandler = hanlder;
+		mActivity = ma;
 	}
 
 	public void startSocket() {
@@ -64,7 +66,7 @@ public class MyServer {
 			socketID = count;
 			this.socket = socket;
 			System.out.println("新增一台客户机，socketID：" + socketID);
-			mHandler.sendEmptyMessage(MainActivity.ADD_CLIENT);
+			mActivity.mHandler.sendEmptyMessage(MainActivity.ADD_CLIENT);
 		}
 
 		@Override
@@ -77,24 +79,21 @@ public class MyServer {
 				String s = new String();
 				while (isStartServer) {
 					reader.read(b);
-					for (char cs : b) {
-						System.out.print(cs);
-					}
 					s = new String(b);
-					System.out.println();
+					System.out.println(s);
 					
 					MessageBody mb = new MessageBody();
-					mb.machineNo = s.substring(0, 2);
+					mb.machineNo = s.substring(0, 3);
 					mb.dataType = s.substring(3, 4);
-					mb.data = s.substring(4, 7);
-					Thread.sleep(100);
+					mb.data = s.substring(4, 8);
+					Thread.sleep(200);
 					Message msg = new Message();
 					msg.obj = mb;
 					msg.what = MainActivity.MESSAGE_GET;
-					mHandler.dispatchMessage(msg);
+					mActivity.mHandler.sendMessage(msg);
 					
-					writer.write(b);
-					writer.flush();
+//					writer.write(b);
+//					writer.flush();
 					
 				}
 				socket.close();
@@ -110,7 +109,7 @@ public class MyServer {
 		String machineNo;
 		String dataType;
 		String runningStatus;
-		String lineCut;
+		int lineCut;
 		String data;
 	}
 }

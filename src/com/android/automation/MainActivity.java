@@ -2,21 +2,25 @@ package com.android.automation;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.YAxis.AxisDependency;
+import com.android.automation.MyServer.MessageBody;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.Legend.LegendPosition;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.database.DataSetObserver;
-import android.graphics.Color;
+import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
@@ -31,12 +35,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnClickListener ,OnChartValueSelectedListener {
+public class MainActivity extends Activity implements OnClickListener, OnChartValueSelectedListener {
 	Socket socket = null;
 	String buffer = "";
 	TextView txt1;
@@ -44,7 +47,6 @@ public class MainActivity extends Activity implements OnClickListener ,OnChartVa
 	EditText ed1;
 	String geted1;
 	GridView mGridView;
-	String[] data = new String[] { "fdafa", "dafaf", "fdafa", "dafaf", "fdafa", "dafaf" };
 	public static final int ADD_CLIENT = 0;
 	public static final int DELETE_CLIENT = 1;
 	public static final int MESSAGE_GET = 3;
@@ -53,23 +55,51 @@ public class MainActivity extends Activity implements OnClickListener ,OnChartVa
 	TextView mEndServer;
 	TextView mTotal;
 	static int mTotalMachines;
-	ViewPager mPager;
+	GuideViewPager mPager;
 	List<View> mPages;
-	
-	 private LineChart mChart;
-	 private LineChart mChart1;
 
-	Handler mHandler = new Handler() {
+	List<MessageBody> messageBody = new ArrayList<MyServer.MessageBody>();
+	HashMap map = new HashMap<String, MessageBody>();
+	ListView mCharts;
+	GridAdapter mGridAdapter = new GridAdapter(this);
+	PieChart mPieChart;
+	
+	ChartListAdapter mChartListAdapter = new ChartListAdapter(this);
+
+	public Handler mHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 			case ADD_CLIENT:
 				mTotalMachines++;
 				mTotal.setText(String.format(getResources().getString(R.string.totalmachines), mTotalMachines));
-				mHandler.sendEmptyMessageDelayed(ADD_CLIENT, 2000);
-				addEntry();
 				break;
 			case DELETE_CLIENT:
 				mTotalMachines--;
+				break;
+			case MESSAGE_GET:
+				MessageBody mb = (MessageBody) msg.obj;
+				if (!map.containsKey(mb.machineNo)) {
+					System.out.println("add one machine");
+					mGridAdapter.messageBody.add(mb);
+					map.put(mb.machineNo, mb);
+					LineData ld = new LineData();
+					LineDataSet set = ld.getDataSetByIndex(0);
+					if (set == null) {
+						set = mChartListAdapter.createSet();
+						ld.addDataSet(set);
+					}
+					ld.addXValue(set.getEntryCount() + "");
+					ld.addEntry(new Entry(Float.parseFloat(mb.data), 1), 0);
+					mChartListAdapter.mData.add(ld);
+					mChartListAdapter.notifyDataSetChanged();
+					mGridView.setAdapter(mGridAdapter);
+					mCharts.setAdapter(mChartListAdapter);
+				}else{
+					
+				}
+				System.out.println("machine no:" + mb.machineNo);
+				System.out.println("datatype:" + mb.dataType);
+				System.out.println("data:" + mb.data);
 				break;
 			}
 		};
@@ -80,50 +110,82 @@ public class MainActivity extends Activity implements OnClickListener ,OnChartVa
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		mPager = (ViewPager) findViewById(R.id.vPager);
+		mPager = (GuideViewPager) findViewById(R.id.vPager);
+		mPager.setBackGroud(BitmapFactory.decodeResource(getResources(), R.drawable.pagerbg));
 		mPages = new ArrayList<View>();
 
 		LayoutInflater mInflater = getLayoutInflater();
 		View main = mInflater.inflate(R.layout.mainframe, null);
 		View chart = mInflater.inflate(R.layout.chart, null);
-		
+		View stop = mInflater.inflate(R.layout.sendstop, null);
+		View pieChart = mInflater.inflate(R.layout.piechart, null);
+
 		mPages.add(main);
 		mPages.add(chart);
+		mPages.add(stop);
+		mPages.add(pieChart);
 		mPager.setAdapter(new MyPagerAdapter(mPages));
 		mPager.setCurrentItem(0);
-		
+
 		mStartServer = (TextView) main.findViewById(R.id.startserver);
 		mEndServer = (TextView) main.findViewById(R.id.endserver);
 		mTotal = (TextView) main.findViewById(R.id.totalmachine);
 		mGridView = (GridView) main.findViewById(R.id.grid);
-		mGridView.setAdapter(mAdapter);
+
+		mGridView.setAdapter(mGridAdapter);
 		mGridView.setOnItemClickListener(mItemClickListener);
 		mStartServer.setOnClickListener(this);
 		mEndServer.setOnClickListener(this);
+
+		mCharts = (ListView) chart.findViewById(R.id.chartlist);
+		mCharts.setAdapter(mChartListAdapter);
 		
-		mChart = (LineChart) chart.findViewById(R.id.chart1);
-        mChart.setOnChartValueSelectedListener(this);
-        mChart.setDrawGridBackground(false);
-        mChart.setDescription("");
-        mChart.setData(new LineData());
-        mChart.invalidate();
+		mPieChart = (PieChart)pieChart.findViewById(R.id.chart);
+		mPieChart.setDescription("");
+        mPieChart.setHoleRadius(52f);
+        mPieChart.setTransparentCircleRadius(57f);
+        mPieChart.setCenterText("沪龙电机");
+        mPieChart.setCenterTextSize(18f);
+        mPieChart.setUsePercentValues(true);
         
-        mChart1 = (LineChart) chart.findViewById(R.id.chart2);
-        mChart1.setOnChartValueSelectedListener(this);
-        mChart1.setDrawGridBackground(false);
-        mChart1.setDescription("");
-        mChart1.setData(new LineData());
-        mChart1.invalidate();
+        ArrayList<Entry> entries = new ArrayList<Entry>();
+
+        for (int i = 0; i < 4; i++) {
+            entries.add(new Entry((int) (Math.random() * 70) + 30, i));
+        }
+
+        PieDataSet d = new PieDataSet(entries, "");
         
-        mHandler.sendEmptyMessageDelayed(ADD_CLIENT, 2000);
+        // space between slices
+        d.setSliceSpace(2f);
+        d.setColors(ColorTemplate.VORDIPLOM_COLORS);
+        
+        PieData cd = new PieData(getQuarters(), d);
+        mPieChart.setData(cd);
+        Legend l = mPieChart.getLegend();
+        l.setPosition(LegendPosition.RIGHT_OF_CHART);
+        l.setYEntrySpace(0f);
+        l.setYOffset(0f);
+        mPieChart.animateXY(900, 900);
 	}
+	
+	 private ArrayList<String> getQuarters() {
+	        
+	        ArrayList<String> q = new ArrayList<String>();
+	        q.add("1st Quarter");
+	        q.add("2nd Quarter");
+	        q.add("3rd Quarter");
+	        q.add("4th Quarter");
+	        
+	        return q;
+	    }
 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.startserver:
 			new Thread() {
 				public void run() {
-					MyServer server = new MyServer(mHandler);
+					MyServer server = new MyServer(MainActivity.this);
 					server.startSocket();
 				};
 			}.start();
@@ -138,108 +200,14 @@ public class MainActivity extends Activity implements OnClickListener ,OnChartVa
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			Log.i(TAG, "position:" + position);
-			Intent intent = new Intent();
-			intent.putExtra("position", position);
-			intent.setClass(MainActivity.this, DynamicalAddingActivity.class);
-			startActivity(intent);
+			// Intent intent = new Intent();
+			// intent.putExtra("position", position);
+			// intent.setClass(MainActivity.this,
+			// DynamicalAddingActivity.class);
+			// startActivity(intent);
 		}
 
 	};
-
-	ListAdapter mAdapter = new ListAdapter() {
-		private ViewHolder viewHolder;
-
-		@Override
-		public void unregisterDataSetObserver(DataSetObserver observer) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void registerDataSetObserver(DataSetObserver observer) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public boolean isEmpty() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean hasStableIds() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public int getViewTypeCount() {
-			// TODO Auto-generated method stub
-			return 1;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			viewHolder = new ViewHolder();
-			if (convertView == null) {
-				convertView = (View) getLayoutInflater().inflate(R.layout.items, null);
-				viewHolder.machineNo = (TextView) convertView.findViewById(R.id.machineno);
-				viewHolder.cutAverage = (TextView) convertView.findViewById(R.id.cutacverage);
-				viewHolder.cutTimes = (TextView) convertView.findViewById(R.id.cuttimes);
-				viewHolder.runningStatus = (ImageView) convertView.findViewById(R.id.runningstatus);
-				convertView.setTag(viewHolder);
-			} else {
-				viewHolder = (ViewHolder) convertView.getTag();
-			}
-
-			return convertView;
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			// TODO Auto-generated method stub
-			return 1;
-		}
-
-		@Override
-		public long getItemId(int position) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public Object getItem(int position) {
-			// TODO Auto-generated method stub
-			return data[position];
-		}
-
-		@Override
-		public int getCount() {
-			// TODO Auto-generated method stub
-			return data.length;
-		}
-
-		@Override
-		public boolean isEnabled(int position) {
-			// TODO Auto-generated method stub
-			return true;
-		}
-
-		@Override
-		public boolean areAllItemsEnabled() {
-			// TODO Auto-generated method stub
-			return true;
-		}
-	};
-
-	@SuppressWarnings("unused")
-	private class ViewHolder {
-		private TextView machineNo;
-		private ImageView runningStatus;
-		private TextView cutTimes;
-		private TextView cutAverage;
-	}
 
 	public class MyPagerAdapter extends PagerAdapter {
 
@@ -272,138 +240,14 @@ public class MainActivity extends Activity implements OnClickListener ,OnChartVa
 
 	}
 
-	int[] mColors = ColorTemplate.VORDIPLOM_COLORS;
+	@Override
+	public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+		Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+	}
 
-    private void addEntry() {
+	@Override
+	public void onNothingSelected() {
 
-        LineData data = mChart.getData();
-        
-        if(data != null) {
-
-            LineDataSet set = data.getDataSetByIndex(0);
-            // set.addEntry(...); // can be called as well
-
-            if (set == null) {
-                set = createSet();
-                data.addDataSet(set);
-            }
-
-            // add a new x-value first
-            data.addXValue(set.getEntryCount() + "");
-            
-            // choose a random dataSet
-            int randomDataSetIndex = (int) (Math.random() * data.getDataSetCount());
-            
-            data.addEntry(new Entry((float) (Math.random() * 10), set.getEntryCount()), randomDataSetIndex);
-
-            // let the chart know it's data has changed
-            mChart.notifyDataSetChanged();
-            
-            mChart.setVisibleXRangeMaximum(6);
-            mChart.setVisibleYRangeMaximum(15, AxisDependency.LEFT);
-//            
-//            // this automatically refreshes the chart (calls invalidate())
-            mChart.moveViewTo(data.getXValCount()-7, 0, AxisDependency.LEFT);
-        }
-    }
-
-    private void removeLastEntry() {
-
-        LineData data = mChart.getData();
-        
-        if(data != null) {
-         
-            LineDataSet set = data.getDataSetByIndex(0);
-
-            if (set != null) {
-
-                Entry e = set.getEntryForXIndex(set.getEntryCount() - 1);
-
-                data.removeEntry(e, 0);
-                // or remove by index
-                // mData.removeEntry(xIndex, dataSetIndex);
-
-                mChart.notifyDataSetChanged();
-                mChart.invalidate();
-            }
-        }
-    }
-
-    private void addDataSet() {
-
-        LineData data = mChart.getData();
-        
-        if(data != null) {
-
-            int count = (data.getDataSetCount() + 1);
-
-            // create 10 y-vals
-            ArrayList<Entry> yVals = new ArrayList<Entry>();
-            
-            if(data.getXValCount() == 0) {
-                // add 10 x-entries
-                for (int i = 0; i < 10; i++) {
-                    data.addXValue("" + (i+1));
-                }
-            }
-
-            for (int i = 0; i < data.getXValCount(); i++) {
-                yVals.add(new Entry((float) (Math.random() * 50f) + 50f * count, i));
-            }
-
-            LineDataSet set = new LineDataSet(yVals, "DataSet " + count);
-            set.setLineWidth(2.5f);
-            set.setCircleSize(4.5f);
-
-            int color = mColors[count % mColors.length];
-
-            set.setColor(color);
-            set.setCircleColor(color);
-            set.setHighLightColor(color);
-            set.setValueTextSize(10f);
-            set.setValueTextColor(color);
-
-            data.addDataSet(set);
-            mChart.notifyDataSetChanged();
-            mChart.invalidate();   
-        }
-    }
-
-    private void removeDataSet() {
-
-        LineData data = mChart.getData();
-        
-        if(data != null) {
-
-            data.removeDataSet(data.getDataSetByIndex(data.getDataSetCount() - 1));
-
-            mChart.notifyDataSetChanged();
-            mChart.invalidate();   
-        }
-    }
-
-    @Override
-    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-        Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onNothingSelected() {
-
-    }
-    
-    private LineDataSet createSet() {
-
-        LineDataSet set = new LineDataSet(null, "DataSet 1");
-        set.setLineWidth(2.5f);
-        set.setCircleSize(4.5f);
-        set.setColor(Color.rgb(240, 99, 99));
-        set.setCircleColor(Color.rgb(240, 99, 99));
-        set.setHighLightColor(Color.rgb(190, 190, 190));
-        set.setAxisDependency(AxisDependency.LEFT);
-        set.setValueTextSize(10f);
-
-        return set;
-    }
+	}
 
 }

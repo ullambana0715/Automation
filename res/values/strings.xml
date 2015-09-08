@@ -5,5 +5,6 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="totalmachines">当前有%d台机器连接</string>
+    <string name="machine_no">机器号:%s</string>
 
 </resources>
