@@ -84,8 +84,8 @@ public class MyServer {
 					
 					MessageBody mb = new MessageBody();
 					mb.machineNo = s.substring(0, 3);
-					mb.dataType = s.substring(3, 4);
-					mb.data = s.substring(4, 8);
+					mb.dataType = Integer.parseInt(s.substring(3, 4));
+					mb.data = Integer.parseInt(s.substring(4, 8));
 					Thread.sleep(200);
 					Message msg = new Message();
 					msg.obj = mb;
@@ -107,9 +107,10 @@ public class MyServer {
 	
 	class MessageBody {
 		String machineNo;
-		String dataType;
-		String runningStatus;
+		int dataType;
+		int runningStatus;
 		int lineCut;
-		String data;
+		int data;
+		int errortimes;
 	}
 }

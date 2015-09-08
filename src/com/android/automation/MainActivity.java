@@ -82,6 +82,9 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 					System.out.println("add one machine");
 					mGridAdapter.messageBody.add(mb);
 					map.put(mb.machineNo, mb);
+					
+					
+					
 					LineData ld = new LineData();
 					LineDataSet set = ld.getDataSetByIndex(0);
 					if (set == null) {
@@ -89,7 +92,7 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 						ld.addDataSet(set);
 					}
 					ld.addXValue(set.getEntryCount() + "");
-					ld.addEntry(new Entry(Float.parseFloat(mb.data), 1), 0);
+					ld.addEntry(new Entry(mb.data, 1), 0);
 					mChartListAdapter.mData.add(ld);
 					mChartListAdapter.notifyDataSetChanged();
 					mGridView.setAdapter(mGridAdapter);
