@@ -74,20 +74,21 @@ public class GridAdapter extends BaseAdapter{
 		
 		if(messageBody.get(position).dataType == 3){
 			messageBody.get(position).lineCut ++ ;
-			viewHolder.cutTimes.setText("减线次数："+messageBody.get(position).lineCut/3);
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 			viewHolder.data.setText("当前速度：0");
 		}else if(messageBody.get(position).dataType == 1){
 			viewHolder.data.setText("当前速度："+messageBody.get(position).data);
-			viewHolder.cutTimes.setText("减线次数："+messageBody.get(position).lineCut/3);
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 		}else if(messageBody.get(position).dataType == 2){
 //			viewHolder.data.setText("当前电压："+messageBody.get(position).data);
 			viewHolder.data.setText("当前速度：0");
-			viewHolder.cutTimes.setText("减线次数："+messageBody.get(position).lineCut/3);
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 			System.out.println("当前电压");
 		}else{
-			
+			viewHolder.data.setText("当前速度：0");
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 		}
-		viewHolder.cutTimes.setText("减线次数："+messageBody.get(position).lineCut/3);
+		viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 //		if(mActivity.messageBody.get(position).runningStatus.equals(0)){
 //			viewHolder.runningStatus.setImageResource(R.drawable.ic_alert);
 //		}else{

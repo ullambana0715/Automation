@@ -39,7 +39,7 @@
         android:textSize="16sp"
         android:background="@drawable/textbg"
         android:gravity="center"
-        android:text="剪线次数：0" />
+        android:text="计件数：0" />
 
     <TextView
         android:id="@+id/cutacverage"
