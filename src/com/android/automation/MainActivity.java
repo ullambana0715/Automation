@@ -57,12 +57,15 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 	static int mTotalMachines;
 	GuideViewPager mPager;
 	List<View> mPages;
+	
+	boolean pause;
 
 	List<MessageBody> messageBody = new ArrayList<MyServer.MessageBody>();
 	HashMap map = new HashMap<String, MessageBody>();
 	ListView mCharts;
 	GridAdapter mGridAdapter = new GridAdapter(this);
 	PieChart mPieChart;
+	int counter;
 	
 	ChartListAdapter mChartListAdapter = new ChartListAdapter(this);
 
@@ -82,8 +85,7 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 					System.out.println("add one machine");
 					mGridAdapter.messageBody.add(mb);
 					map.put(mb.machineNo, mb);
-					
-					
+					mGridView.setAdapter(mGridAdapter);
 					
 					LineData ld = new LineData();
 					LineDataSet set = ld.getDataSetByIndex(0);
@@ -95,11 +97,43 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 					ld.addEntry(new Entry(mb.data, 1), 0);
 					mChartListAdapter.mData.add(ld);
 					mChartListAdapter.notifyDataSetChanged();
-					mGridView.setAdapter(mGridAdapter);
 					mCharts.setAdapter(mChartListAdapter);
 				}else{
+					if (counter > 2) {
+						for(int i=0;i<mGridAdapter.messageBody.size();i++){
+							if(mGridAdapter.messageBody.get(i).machineNo.equals(mb.machineNo)){
+								mb.lineCut = mGridAdapter.messageBody.get(i).lineCut;
+								mGridAdapter.messageBody.set(i, mb);
+//								mGridAdapter.notifyDataSetChanged();
+								mGridView.setAdapter(mGridAdapter);
+							}
+						}
 					
+						counter = 0;
+						for(int i=0;i<mGridAdapter.messageBody.size();i++){
+							if(mGridAdapter.messageBody.get(i).machineNo.equals(mb.machineNo)){
+								if(mGridAdapter.messageBody.get(i).dataType == 1){
+									LineDataSet set =mChartListAdapter.mData.get(i).getDataSetByIndex(0);
+									mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
+									int randomDataSetIndex = (int) (Math.random() * mChartListAdapter.mData.get(i).getDataSetCount());
+									mChartListAdapter.mData.get(i).addEntry(new Entry(mb.data, set.getEntryCount()), randomDataSetIndex);
+									mChartListAdapter.notifyDataSetChanged();
+								}else{
+									LineDataSet set =mChartListAdapter.mData.get(i).getDataSetByIndex(0);
+									mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
+									int randomDataSetIndex = (int) (Math.random() * mChartListAdapter.mData.get(i).getDataSetCount());
+									mChartListAdapter.mData.get(i).addEntry(new Entry(0, set.getEntryCount()), randomDataSetIndex);
+									mChartListAdapter.notifyDataSetChanged();
+								}
+							}
+						}
+					}else{
+						counter++;
+					}
 				}
+				
+				
+				
 				System.out.println("machine no:" + mb.machineNo);
 				System.out.println("datatype:" + mb.dataType);
 				System.out.println("data:" + mb.data);
@@ -114,7 +148,6 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 		setContentView(R.layout.activity_main);
 
 		mPager = (GuideViewPager) findViewById(R.id.vPager);
-		mPager.setBackGroud(BitmapFactory.decodeResource(getResources(), R.drawable.pagerbg));
 		mPages = new ArrayList<View>();
 
 		LayoutInflater mInflater = getLayoutInflater();
@@ -147,7 +180,7 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 		mPieChart.setDescription("");
         mPieChart.setHoleRadius(52f);
         mPieChart.setTransparentCircleRadius(57f);
-        mPieChart.setCenterText("沪龙电机");
+        mPieChart.setCenterText("速度统计");
         mPieChart.setCenterTextSize(18f);
         mPieChart.setUsePercentValues(true);
         
@@ -175,10 +208,10 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 	 private ArrayList<String> getQuarters() {
 	        
 	        ArrayList<String> q = new ArrayList<String>();
-	        q.add("1st Quarter");
-	        q.add("2nd Quarter");
-	        q.add("3rd Quarter");
-	        q.add("4th Quarter");
+	        q.add("第一分区");
+	        q.add("第二分区");
+	        q.add("第三分区");
+	        q.add("第四分区");
 	        
 	        return q;
 	    }

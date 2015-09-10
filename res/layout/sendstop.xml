@@ -5,6 +5,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -12,14 +13,13 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="请输入需要停止的机器号：" />
+            android:text="请输入机器号：" />
 
         <EditText
             android:id="@+id/editText1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="9"
+			android:ems="8"
             android:inputType="number" >
 
             <requestFocus />
@@ -28,11 +28,31 @@
 
     <Button
         android:id="@+id/button1"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="29dp"
-        android:text="停止" />
+        android:background="@android:color/holo_green_dark"
+        android:text="发送" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="请输入数据：    " />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="8" />
+    </LinearLayout>
 
 </RelativeLayout>

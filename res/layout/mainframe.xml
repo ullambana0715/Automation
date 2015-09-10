@@ -2,8 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" 
-    android:background="@drawable/mainbg">
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:id="@+id/gridbackgroud"
@@ -46,7 +45,7 @@
             android:layout_weight="1"
             android:background="@drawable/bottombuttonbg"
             android:gravity="center"
-            android:text="startserver" />
+            android:text="启动监听" />
 
         <TextView
             android:id="@+id/endserver"
@@ -55,7 +54,7 @@
             android:layout_weight="1"
             android:background="@drawable/bottombuttonbg"
             android:gravity="center"
-            android:text="end server" />
+            android:text="停止监听" />
     </LinearLayout>
 
 </FrameLayout>

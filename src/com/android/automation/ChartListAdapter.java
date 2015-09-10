@@ -86,8 +86,8 @@ public class ChartListAdapter extends BaseAdapter implements OnChartValueSelecte
 		mHolder.mChart.setDrawGridBackground(false);
 		mHolder.mChart.setDescription("");
 		mHolder.mChart.setData(data);
-		mHolder.mChart.setVisibleXRangeMaximum(60);
-		mHolder.mChart.setVisibleYRangeMaximum(2000, AxisDependency.LEFT);
+		mHolder.mChart.setVisibleXRangeMaximum(500);
+		mHolder.mChart.setVisibleYRangeMaximum(9999, AxisDependency.LEFT);
 		mHolder.mChart.moveViewTo(data.getXValCount() - 7, 0, AxisDependency.LEFT);
 		mHolder.mChart.notifyDataSetChanged();
 		mHolder.mChart.invalidate();

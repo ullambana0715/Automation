@@ -30,15 +30,16 @@ public class MyServer {
 	private ArrayList<SocketThread> mThreadList = new ArrayList<SocketThread>();
 	Handler mHandler;
 	MainActivity mActivity;
+
 	public MyServer(MainActivity ma) {
-//		mHandler = hanlder;
+		// mHandler = hanlder;
 		mActivity = ma;
 	}
 
 	public void startSocket() {
 		try {
 			isStartServer = true;
-			int prot = 2000;
+			int prot = 5000;
 			mServer = new ServerSocket(prot);
 			System.out.println("启动server,端口:" + prot);
 			Socket socket = null;
@@ -61,6 +62,7 @@ public class MyServer {
 		public Socket socket;
 		public BufferedWriter writer;
 		public BufferedReader reader;
+		int counter;
 
 		public SocketThread(Socket socket, int count) {
 			socketID = count;
@@ -81,30 +83,41 @@ public class MyServer {
 					reader.read(b);
 					s = new String(b);
 					System.out.println(s);
-					
+
 					MessageBody mb = new MessageBody();
 					mb.machineNo = s.substring(0, 3);
 					mb.dataType = Integer.parseInt(s.substring(3, 4));
 					mb.data = Integer.parseInt(s.substring(4, 8));
-					Thread.sleep(200);
+
 					Message msg = new Message();
 					msg.obj = mb;
 					msg.what = MainActivity.MESSAGE_GET;
 					mActivity.mHandler.sendMessage(msg);
-					
-//					writer.write(b);
-//					writer.flush();
-					
+
+					if (counter > 30) {
+						counter = 0;
+						System.out.println("write ok");
+						writer.write("OK");
+						writer.flush();
+					} else {
+						counter++;
+//						System.out.println("write pass");
+//						writer.write("O");
+//						writer.flush();
+					}
+					Thread.sleep(200);
 				}
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	class MessageBody {
 		String machineNo;
 		int dataType;
