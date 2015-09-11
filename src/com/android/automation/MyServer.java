@@ -55,6 +55,16 @@ public class MyServer {
 			e.printStackTrace();
 		}
 	}
+	
+	public void stopSocket(){
+		try {
+			isStartServer = false;
+			mServer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public class SocketThread extends Thread {
 

@@ -67,6 +67,8 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 	PieChart mPieChart;
 	int counter;
 	
+	MyServer server;
+	
 	ChartListAdapter mChartListAdapter = new ChartListAdapter(this);
 
 	public Handler mHandler = new Handler() {
@@ -219,12 +221,14 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.startserver:
-			new Thread() {
-				public void run() {
-					MyServer server = new MyServer(MainActivity.this);
-					server.startSocket();
-				};
-			}.start();
+			if(server == null){
+				new Thread() {
+					public void run() {
+						server = new MyServer(MainActivity.this);
+						server.startSocket();
+					};
+				}.start();
+			}
 			break;
 		case R.id.endserver:
 			break;
