@@ -75,12 +75,11 @@ public class GridAdapter extends BaseAdapter{
 		if(messageBody.get(position).dataType == 3){
 			messageBody.get(position).lineCut ++ ;
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
-			viewHolder.data.setText("当前速度：0");
+//			viewHolder.data.setText("当前速度：0");
 		}else if(messageBody.get(position).dataType == 1){
 			viewHolder.data.setText("当前速度："+messageBody.get(position).data);
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 		}else if(messageBody.get(position).dataType == 2){
-//			viewHolder.data.setText("当前电压："+messageBody.get(position).data);
 			viewHolder.data.setText("当前速度：0");
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 			System.out.println("当前电压");
@@ -89,11 +88,6 @@ public class GridAdapter extends BaseAdapter{
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 		}
 		viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
-//		if(mActivity.messageBody.get(position).runningStatus.equals(0)){
-//			viewHolder.runningStatus.setImageResource(R.drawable.ic_alert);
-//		}else{
-//			viewHolder.runningStatus.setImageResource(R.drawable.ic_launcher);
-//		}
 
 		return convertView;
 	}
@@ -132,6 +126,23 @@ public class GridAdapter extends BaseAdapter{
 	public boolean areAllItemsEnabled() {
 		// TODO Auto-generated method stub
 		return true;
+	}
+	
+	public void updateAssignedView(int position,MessageBody mb){
+		int firstVisiblePosition = mActivity.mGridView.getFirstVisiblePosition();
+        int lastVisiblePosition = mActivity.mGridView.getLastVisiblePosition();
+        if(position>=firstVisiblePosition && position<=lastVisiblePosition){
+            View view = mActivity.mGridView.getChildAt(position - firstVisiblePosition);
+            if(view.getTag() instanceof ViewHolder){
+                ViewHolder vh = (ViewHolder)view.getTag();
+                
+            }
+        }
+	}
+	
+	public void addList(MessageBody mb){
+		messageBody.add(mb);
+		this.notifyDataSetChanged();
 	}
 	
 	private class ViewHolder {

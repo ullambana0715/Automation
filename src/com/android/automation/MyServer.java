@@ -2,23 +2,14 @@ package com.android.automation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.CharBuffer;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-
-import org.json.JSONObject;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 
 public class MyServer {
@@ -26,14 +17,14 @@ public class MyServer {
 	private boolean isStartServer;
 	private ServerSocket mServer;
 
-	private ArrayList<SocketMessage> mMsgList = new ArrayList<SocketMessage>();
+	private ArrayList<MessageBody> mMsgList = new ArrayList<MessageBody>();
 	private ArrayList<SocketThread> mThreadList = new ArrayList<SocketThread>();
 	Handler mHandler;
 	MainActivity mActivity;
 
 	public MyServer(MainActivity ma) {
-		// mHandler = hanlder;
-		mActivity = ma;
+		 mHandler = ma.mHandler;
+//		mActivity = ma;
 	}
 
 	public void startSocket() {
@@ -54,6 +45,38 @@ public class MyServer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void startMessageThread() {
+		new Thread(){
+			@Override
+			public void run() {
+				super.run();
+				try {
+					while(isStartServer) {
+						if(mMsgList.size() > 0) {
+							MessageBody from = mMsgList.get(0);
+							for(SocketThread to : mThreadList) {
+//								if(to.socketID == from.to) {
+									BufferedWriter writer = to.writer;
+//									JSONObject json = new JSONObject();
+//									json.put("from", from.from);
+//									json.put("msg", from.msg);
+//									json.put("time", from.time);
+//									writer.write(json.toString()+"\n");
+									writer.flush();
+									break;
+//								}
+							}
+							mMsgList.remove(0);
+						}
+						Thread.sleep(200);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
 	}
 	
 	public void stopSocket(){
@@ -78,7 +101,7 @@ public class MyServer {
 			socketID = count;
 			this.socket = socket;
 			System.out.println("新增一台客户机，socketID：" + socketID);
-			mActivity.mHandler.sendEmptyMessage(MainActivity.ADD_CLIENT);
+//			mActivity.mHandler.sendEmptyMessage(MainActivity.ADD_CLIENT);
 		}
 
 		@Override
@@ -92,7 +115,7 @@ public class MyServer {
 				while (isStartServer) {
 					reader.read(b);
 					s = new String(b);
-					System.out.println(s);
+//					System.out.println("received : "+s);
 
 					MessageBody mb = new MessageBody();
 					mb.machineNo = s.substring(0, 3);
@@ -102,7 +125,13 @@ public class MyServer {
 					Message msg = new Message();
 					msg.obj = mb;
 					msg.what = MainActivity.MESSAGE_GET;
-					mActivity.mHandler.sendMessage(msg);
+					
+//					mActivity.mHandler.sendMessage(msg);
+//					SocketMessage sm = new SocketMessage();
+//					sm.from = mb.machineNo;
+//					sm.msg = mb.data+"";
+					mHandler.sendMessage(msg);
+//					mMsgList.add(mb);
 
 					if (counter > 30) {
 						counter = 0;
@@ -115,15 +144,19 @@ public class MyServer {
 //						writer.write("O");
 //						writer.flush();
 					}
-					Thread.sleep(200);
+					Thread.sleep(500);
 				}
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+				System.out.println("IOException");
+//				mHandler.sendEmptyMessage(MainActivity.DELETE_CLIENT);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				System.out.println("InterruptedException");
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
+				System.out.println("NumberFormatException");
 			}
 		}
 	}

@@ -62,19 +62,19 @@ public class MyServer2 {
 					while (isStartServer) {
 						if (mMsgList.size() > 0) {
 							SocketMessage from = mMsgList.get(0);
-							for (SocketThread to : mThreadList) {
-								if (to.socketID == from.to) {
-									BufferedWriter writer = to.writer;
-									JSONObject json = new JSONObject();
-									json.put("from", from.from);
-									json.put("msg", from.msg);
-									json.put("time", from.time);
-									writer.write(json.toString() + "\n");
-									writer.flush();
-									System.out.println("推送消息成功：" + from.msg + ">> to socketID:" + from.to);
-									break;
-								}
-							}
+//							for (SocketThread to : mThreadList) {
+//								if (to.socketID == from.to) {
+//									BufferedWriter writer = to.writer;
+//									JSONObject json = new JSONObject();
+//									json.put("from", from.from);
+//									json.put("msg", from.msg);
+//									json.put("time", from.time);
+//									writer.write(json.toString() + "\n");
+//									writer.flush();
+//									System.out.println("推送消息成功：" + from.msg + ">> to socketID:" + from.to);
+//									break;
+//								}
+//							}
 							mMsgList.remove(0);
 						}
 						Thread.sleep(200);

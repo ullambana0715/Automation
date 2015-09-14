@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 	static int mTotalMachines;
 	GuideViewPager mPager;
 	List<View> mPages;
-	
+
 	boolean pause;
 
 	List<MessageBody> messageBody = new ArrayList<MyServer.MessageBody>();
@@ -66,17 +66,20 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 	GridAdapter mGridAdapter = new GridAdapter(this);
 	PieChart mPieChart;
 	int counter;
-	
+	int isNext;
 	MyServer server;
-	
+
 	ChartListAdapter mChartListAdapter = new ChartListAdapter(this);
 
 	public Handler mHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 			case ADD_CLIENT:
-				mTotalMachines++;
-				mTotal.setText(String.format(getResources().getString(R.string.totalmachines), mTotalMachines));
+				// mTotalMachines++;
+				// if (!map.containsKey(mb.machineNo)) {
+				// mTotal.setText(String.format(getResources().getString(R.string.totalmachines),
+				// messageBody.size()+1));
+				// }
 				break;
 			case DELETE_CLIENT:
 				mTotalMachines--;
@@ -87,8 +90,8 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 					System.out.println("add one machine");
 					mGridAdapter.messageBody.add(mb);
 					map.put(mb.machineNo, mb);
-					mGridView.setAdapter(mGridAdapter);
-					
+					mGridAdapter.notifyDataSetChanged();
+
 					LineData ld = new LineData();
 					LineDataSet set = ld.getDataSetByIndex(0);
 					if (set == null) {
@@ -99,43 +102,41 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 					ld.addEntry(new Entry(mb.data, 1), 0);
 					mChartListAdapter.mData.add(ld);
 					mChartListAdapter.notifyDataSetChanged();
-					mCharts.setAdapter(mChartListAdapter);
-				}else{
-					if (counter > 2) {
-						for(int i=0;i<mGridAdapter.messageBody.size();i++){
-							if(mGridAdapter.messageBody.get(i).machineNo.equals(mb.machineNo)){
+					mTotal.setText(String.format(getResources().getString(R.string.totalmachines), messageBody.size()));
+				} else {
+					for (int i = 0; i < mGridAdapter.messageBody.size(); i++) {
+						if (mGridAdapter.messageBody.get(i).machineNo.equals(mb.machineNo)) {
+							if (mGridAdapter.messageBody.get(i).dataType == 1) {
+								LineDataSet set = mChartListAdapter.mData.get(i).getDataSetByIndex(0);
+								mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
+//								mChartListAdapter.updateAssignedView(i, new Entry(mb.data, set.getEntryCount()));
+								int randomDataSetIndex = (int) (Math.random()
+										* mChartListAdapter.mData.get(i).getDataSetCount());
+								mChartListAdapter.mData.get(i).addEntry(new Entry(mb.data, set.getEntryCount()),
+										randomDataSetIndex);
+								mChartListAdapter.notifyDataSetChanged();
+								
 								mb.lineCut = mGridAdapter.messageBody.get(i).lineCut;
 								mGridAdapter.messageBody.set(i, mb);
-//								mGridAdapter.notifyDataSetChanged();
+								mGridView.setAdapter(mGridAdapter);
+								System.out.println("machine is the same");
+							} else {
+								LineDataSet set = mChartListAdapter.mData.get(i).getDataSetByIndex(0);
+								mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
+								int randomDataSetIndex = (int) (Math.random()
+										* mChartListAdapter.mData.get(i).getDataSetCount());
+								mChartListAdapter.mData.get(i).addEntry(new Entry(0, set.getEntryCount()),
+										randomDataSetIndex);
+								mChartListAdapter.notifyDataSetChanged();
+								
+								mb.lineCut = mGridAdapter.messageBody.get(i).lineCut;
+								mGridAdapter.messageBody.set(i, mb);
 								mGridView.setAdapter(mGridAdapter);
 							}
 						}
-					
-						counter = 0;
-						for(int i=0;i<mGridAdapter.messageBody.size();i++){
-							if(mGridAdapter.messageBody.get(i).machineNo.equals(mb.machineNo)){
-								if(mGridAdapter.messageBody.get(i).dataType == 1){
-									LineDataSet set =mChartListAdapter.mData.get(i).getDataSetByIndex(0);
-									mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
-									int randomDataSetIndex = (int) (Math.random() * mChartListAdapter.mData.get(i).getDataSetCount());
-									mChartListAdapter.mData.get(i).addEntry(new Entry(mb.data, set.getEntryCount()), randomDataSetIndex);
-									mChartListAdapter.notifyDataSetChanged();
-								}else{
-									LineDataSet set =mChartListAdapter.mData.get(i).getDataSetByIndex(0);
-									mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
-									int randomDataSetIndex = (int) (Math.random() * mChartListAdapter.mData.get(i).getDataSetCount());
-									mChartListAdapter.mData.get(i).addEntry(new Entry(0, set.getEntryCount()), randomDataSetIndex);
-									mChartListAdapter.notifyDataSetChanged();
-								}
-							}
-						}
-					}else{
-						counter++;
 					}
 				}
-				
-				
-				
+
 				System.out.println("machine no:" + mb.machineNo);
 				System.out.println("datatype:" + mb.dataType);
 				System.out.println("data:" + mb.data);
@@ -177,51 +178,51 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 
 		mCharts = (ListView) chart.findViewById(R.id.chartlist);
 		mCharts.setAdapter(mChartListAdapter);
-		
-		mPieChart = (PieChart)pieChart.findViewById(R.id.chart);
+
+		mPieChart = (PieChart) pieChart.findViewById(R.id.chart);
 		mPieChart.setDescription("");
-        mPieChart.setHoleRadius(52f);
-        mPieChart.setTransparentCircleRadius(57f);
-        mPieChart.setCenterText("速度统计");
-        mPieChart.setCenterTextSize(18f);
-        mPieChart.setUsePercentValues(true);
-        
-        ArrayList<Entry> entries = new ArrayList<Entry>();
+		mPieChart.setHoleRadius(52f);
+		mPieChart.setTransparentCircleRadius(57f);
+		mPieChart.setCenterText("速度统计");
+		mPieChart.setCenterTextSize(18f);
+		mPieChart.setUsePercentValues(true);
 
-        for (int i = 0; i < 4; i++) {
-            entries.add(new Entry((int) (Math.random() * 70) + 30, i));
-        }
+		ArrayList<Entry> entries = new ArrayList<Entry>();
 
-        PieDataSet d = new PieDataSet(entries, "");
-        
-        // space between slices
-        d.setSliceSpace(2f);
-        d.setColors(ColorTemplate.VORDIPLOM_COLORS);
-        
-        PieData cd = new PieData(getQuarters(), d);
-        mPieChart.setData(cd);
-        Legend l = mPieChart.getLegend();
-        l.setPosition(LegendPosition.RIGHT_OF_CHART);
-        l.setYEntrySpace(0f);
-        l.setYOffset(0f);
-        mPieChart.animateXY(900, 900);
+		for (int i = 0; i < 4; i++) {
+			entries.add(new Entry((int) (Math.random() * 70) + 30, i));
+		}
+
+		PieDataSet d = new PieDataSet(entries, "");
+
+		// space between slices
+		d.setSliceSpace(2f);
+		d.setColors(ColorTemplate.VORDIPLOM_COLORS);
+
+		PieData cd = new PieData(getQuarters(), d);
+		mPieChart.setData(cd);
+		Legend l = mPieChart.getLegend();
+		l.setPosition(LegendPosition.RIGHT_OF_CHART);
+		l.setYEntrySpace(0f);
+		l.setYOffset(0f);
+		mPieChart.animateXY(900, 900);
 	}
-	
-	 private ArrayList<String> getQuarters() {
-	        
-	        ArrayList<String> q = new ArrayList<String>();
-	        q.add("第一分区");
-	        q.add("第二分区");
-	        q.add("第三分区");
-	        q.add("第四分区");
-	        
-	        return q;
-	    }
+
+	private ArrayList<String> getQuarters() {
+
+		ArrayList<String> q = new ArrayList<String>();
+		q.add("第一分区");
+		q.add("第二分区");
+		q.add("第三分区");
+		q.add("第四分区");
+
+		return q;
+	}
 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.startserver:
-			if(server == null){
+			if (server == null) {
 				new Thread() {
 					public void run() {
 						server = new MyServer(MainActivity.this);

@@ -12,7 +12,6 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,36 +19,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 public class ChartListAdapter extends BaseAdapter implements OnChartValueSelectedListener {
-	Context mContext;
 	List<LineData> mData = new ArrayList<LineData>();
 	List<String> mSpeed;
 	private LineChart mChart;
+	MainActivity mActivity;
 
-	public ChartListAdapter(Context c) {
-		mContext = c;
-//		mSpeed = new ArrayList<String>();
-//		mSpeed.add("2.0");
-//		mSpeed.add("3.0");
-//		mSpeed.add("4.0");
-//		mSpeed.add("2.0");
-//		mSpeed.add("2.0");
-//		mSpeed.add("1.0");
-//		mSpeed.add("6.0");
-//		mSpeed.add("3.0");
-//		mSpeed.add("2.0");
-//		mData = new ArrayList<LineData>(5);
-//		for (int i = 0; i < 5; i++) {
-//			LineData ld = new LineData();
-//			LineDataSet set = ld.getDataSetByIndex(0);
-//			if (set == null) {
-//				set = createSet();
-//				ld.addDataSet(set);
-//			}
-//			ld.addXValue(set.getEntryCount() + "");
-//			ld.addEntry(new Entry(Float.parseFloat(mSpeed.get(i)), 1), 0);
-//			mData.add(ld);
-//		}
-
+	public ChartListAdapter(MainActivity c) {
+		mActivity = c;
 	}
 
 	@Override
@@ -76,7 +52,7 @@ public class ChartListAdapter extends BaseAdapter implements OnChartValueSelecte
 		ViewHolder mHolder = null;
 		if (convertView == null) {
 			mHolder = new ViewHolder();
-			convertView = LayoutInflater.from(mContext).inflate(R.layout.chartitems, null);
+			convertView = LayoutInflater.from(mActivity).inflate(R.layout.chartitems, null);
 			mHolder.mChart = (LineChart) convertView.findViewById(R.id.chart);
 			convertView.setTag(mHolder);
 		} else {
@@ -97,6 +73,26 @@ public class ChartListAdapter extends BaseAdapter implements OnChartValueSelecte
 	class ViewHolder {
 		LineData mData;
 		LineChart mChart;
+	}
+	
+	public void addChartList(){
+		
+	}
+	
+	public void updateAssignedView(int pos, Entry en){
+		int firstVisablePosition = mActivity.mCharts.getFirstVisiblePosition();
+		int lastVisablePosition = mActivity.mCharts.getLastVisiblePosition();
+		
+		if(firstVisablePosition <= pos && pos <= lastVisablePosition){
+			View view = mActivity.mCharts.getChildAt(pos - firstVisablePosition);
+			if(view.getTag() instanceof ViewHolder){
+                ViewHolder vh = (ViewHolder)view.getTag();
+                int randomDataSetIndex = (int) (Math.random() *  vh.mChart.getData().getDataSetCount());
+                vh.mChart.getData().addEntry(en, randomDataSetIndex);
+                vh.mChart.notifyDataSetChanged();
+                vh.mChart.invalidate();
+            }
+		}
 	}
 
 	@Override
