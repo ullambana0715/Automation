@@ -73,21 +73,18 @@ public class GridAdapter extends BaseAdapter{
 		viewHolder.machineNo.setText(String.format(mContext.getResources().getString(R.string.machine_no), messageBody.get(position).machineNo));
 		
 		if(messageBody.get(position).dataType == 3){
-			messageBody.get(position).lineCut ++ ;
-			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
-//			viewHolder.data.setText("当前速度：0");
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
 		}else if(messageBody.get(position).dataType == 1){
 			viewHolder.data.setText("当前速度："+messageBody.get(position).data);
-			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
 		}else if(messageBody.get(position).dataType == 2){
 			viewHolder.data.setText("当前速度：0");
-			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
 			System.out.println("当前电压");
 		}else{
 			viewHolder.data.setText("当前速度：0");
-			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
+			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
 		}
-		viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut/3);
 
 		return convertView;
 	}
@@ -105,7 +102,7 @@ public class GridAdapter extends BaseAdapter{
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public MessageBody getItem(int position) {
 		// TODO Auto-generated method stub
 		return messageBody.get(position);
 	}
@@ -135,7 +132,8 @@ public class GridAdapter extends BaseAdapter{
             View view = mActivity.mGridView.getChildAt(position - firstVisiblePosition);
             if(view.getTag() instanceof ViewHolder){
                 ViewHolder vh = (ViewHolder)view.getTag();
-                
+                vh.data.setText("当前速度："+mb.data);
+                vh.cutTimes.setText("计件数："+mb.lineCut);
             }
         }
 	}

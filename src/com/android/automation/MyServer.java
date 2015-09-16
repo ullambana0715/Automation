@@ -14,14 +14,14 @@ import android.os.Message;
 
 public class MyServer {
 
-	private boolean isStartServer;
+	public boolean isStartServer;
 	private ServerSocket mServer;
 
 	private ArrayList<MessageBody> mMsgList = new ArrayList<MessageBody>();
 	private ArrayList<SocketThread> mThreadList = new ArrayList<SocketThread>();
 	Handler mHandler;
 	MainActivity mActivity;
-
+	Socket socket = null;
 	public MyServer(MainActivity ma) {
 		 mHandler = ma.mHandler;
 //		mActivity = ma;
@@ -33,7 +33,6 @@ public class MyServer {
 			int prot = 5000;
 			mServer = new ServerSocket(prot);
 			System.out.println("启动server,端口:" + prot);
-			Socket socket = null;
 			int socketID = 0;
 			while (isStartServer) {
 				socket = mServer.accept();
@@ -146,11 +145,9 @@ public class MyServer {
 					}
 					Thread.sleep(500);
 				}
-				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("IOException");
-//				mHandler.sendEmptyMessage(MainActivity.DELETE_CLIENT);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				System.out.println("InterruptedException");

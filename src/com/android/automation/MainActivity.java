@@ -19,8 +19,6 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import android.app.Activity;
-import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
@@ -72,6 +70,7 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 	ChartListAdapter mChartListAdapter = new ChartListAdapter(this);
 
 	public Handler mHandler = new Handler() {
+		@SuppressWarnings("unchecked")
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 			case ADD_CLIENT:
@@ -85,61 +84,73 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 				mTotalMachines--;
 				break;
 			case MESSAGE_GET:
-				MessageBody mb = (MessageBody) msg.obj;
-				if (!map.containsKey(mb.machineNo)) {
+				MessageBody newMb = (MessageBody) msg.obj;
+				if (!map.containsKey(newMb.machineNo)) {
 					System.out.println("add one machine");
-					mGridAdapter.messageBody.add(mb);
-					map.put(mb.machineNo, mb);
-					mGridAdapter.notifyDataSetChanged();
+					mGridAdapter.addList(newMb);
+					map.put(newMb.machineNo, newMb);
 
-					LineData ld = new LineData();
-					LineDataSet set = ld.getDataSetByIndex(0);
-					if (set == null) {
-						set = mChartListAdapter.createSet();
-						ld.addDataSet(set);
-					}
-					ld.addXValue(set.getEntryCount() + "");
-					ld.addEntry(new Entry(mb.data, 1), 0);
-					mChartListAdapter.mData.add(ld);
-					mChartListAdapter.notifyDataSetChanged();
+//					LineData ld = new LineData();
+//					LineDataSet set = ld.getDataSetByIndex(0);
+//					if (set == null) {
+//						set = mChartListAdapter.createSet();
+//						ld.addDataSet(set);
+//					}
+//					ld.addXValue(set.getEntryCount() + "");
+//					ld.addEntry(new Entry(newMb.data, 1), 0);
+//					mChartListAdapter.mData.add(ld);
+//					mChartListAdapter.notifyDataSetChanged();
 					mTotal.setText(String.format(getResources().getString(R.string.totalmachines), messageBody.size()));
 				} else {
-					for (int i = 0; i < mGridAdapter.messageBody.size(); i++) {
-						if (mGridAdapter.messageBody.get(i).machineNo.equals(mb.machineNo)) {
-							if (mGridAdapter.messageBody.get(i).dataType == 1) {
-								LineDataSet set = mChartListAdapter.mData.get(i).getDataSetByIndex(0);
-								mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
-//								mChartListAdapter.updateAssignedView(i, new Entry(mb.data, set.getEntryCount()));
-								int randomDataSetIndex = (int) (Math.random()
-										* mChartListAdapter.mData.get(i).getDataSetCount());
-								mChartListAdapter.mData.get(i).addEntry(new Entry(mb.data, set.getEntryCount()),
-										randomDataSetIndex);
-								mChartListAdapter.notifyDataSetChanged();
-								
-								mb.lineCut = mGridAdapter.messageBody.get(i).lineCut;
-								mGridAdapter.messageBody.set(i, mb);
-								mGridView.setAdapter(mGridAdapter);
-								System.out.println("machine is the same");
-							} else {
-								LineDataSet set = mChartListAdapter.mData.get(i).getDataSetByIndex(0);
-								mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
-								int randomDataSetIndex = (int) (Math.random()
-										* mChartListAdapter.mData.get(i).getDataSetCount());
-								mChartListAdapter.mData.get(i).addEntry(new Entry(0, set.getEntryCount()),
-										randomDataSetIndex);
-								mChartListAdapter.notifyDataSetChanged();
-								
-								mb.lineCut = mGridAdapter.messageBody.get(i).lineCut;
-								mGridAdapter.messageBody.set(i, mb);
-								mGridView.setAdapter(mGridAdapter);
+					for(int i=0;i<mGridAdapter.getCount();i++){
+						MessageBody mb = mGridAdapter.getItem(i);
+						if(mb.machineNo.equals(newMb.machineNo)){
+							if(newMb.dataType == 3){
+								newMb.lineCut = mb.lineCut + 1;
 							}
+							mGridAdapter.messageBody.set(i, newMb);
+							mGridAdapter.updateAssignedView(i, newMb);
 						}
 					}
+					
+					
+//					for (int i = 0; i < mGridAdapter.messageBody.size(); i++) {
+//						if (mGridAdapter.messageBody.get(i).machineNo.equals(newMb.machineNo)) {
+//							if (mGridAdapter.messageBody.get(i).dataType == 1) {
+//								LineDataSet set = mChartListAdapter.mData.get(i).getDataSetByIndex(0);
+//								mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
+////								mChartListAdapter.updateAssignedView(i, new Entry(mb.data, set.getEntryCount()));
+//								int randomDataSetIndex = (int) (Math.random()
+//										* mChartListAdapter.mData.get(i).getDataSetCount());
+//								mChartListAdapter.mData.get(i).addEntry(new Entry(newMb.data, set.getEntryCount()),
+//										randomDataSetIndex);
+//								mChartListAdapter.notifyDataSetChanged();
+//								
+//								newMb.lineCut = mGridAdapter.messageBody.get(i).lineCut;
+//								mGridAdapter.messageBody.set(i, newMb);
+//								mGridView.setAdapter(mGridAdapter);
+//								System.out.println("machine is the same");
+//							} else {
+//								LineDataSet set = mChartListAdapter.mData.get(i).getDataSetByIndex(0);
+//								mChartListAdapter.mData.get(i).addXValue(set.getEntryCount() + "");
+//								int randomDataSetIndex = (int) (Math.random()
+//										* mChartListAdapter.mData.get(i).getDataSetCount());
+//								mChartListAdapter.mData.get(i).addEntry(new Entry(0, set.getEntryCount()),
+//										randomDataSetIndex);
+//								mChartListAdapter.notifyDataSetChanged();
+//								
+//								newMb.lineCut = mGridAdapter.messageBody.get(i).lineCut;
+//								mGridAdapter.messageBody.set(i, newMb);
+//								mGridView.setAdapter(mGridAdapter);
+//							}
+//						}
+//					}
 				}
 
-				System.out.println("machine no:" + mb.machineNo);
-				System.out.println("datatype:" + mb.dataType);
-				System.out.println("data:" + mb.data);
+				System.out.println("machine no:" + newMb.machineNo);
+				System.out.println("linecut:" + newMb.lineCut);
+				System.out.println("datatype:" + newMb.dataType);
+				System.out.println("data:" + newMb.data);
 				break;
 			}
 		};
@@ -229,11 +240,19 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 						server.startSocket();
 					};
 				}.start();
+			}else{
+				server.isStartServer = true;
 			}
 			break;
 		case R.id.endserver:
+			server.isStartServer = false;
 			break;
 		}
+	};
+	
+	public void onBackPressed() {
+		server.stopSocket();
+		finish();
 	};
 
 	OnItemClickListener mItemClickListener = new OnItemClickListener() {
