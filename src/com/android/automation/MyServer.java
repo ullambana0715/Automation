@@ -46,7 +46,7 @@ public class MyServer {
 		}
 	}
 	
-	public void startMessageThread() {
+	public void sendStop(final String s) {
 		new Thread(){
 			@Override
 			public void run() {
@@ -54,20 +54,25 @@ public class MyServer {
 				try {
 					while(isStartServer) {
 						if(mMsgList.size() > 0) {
-							MessageBody from = mMsgList.get(0);
-							for(SocketThread to : mThreadList) {
-//								if(to.socketID == from.to) {
-									BufferedWriter writer = to.writer;
-//									JSONObject json = new JSONObject();
-//									json.put("from", from.from);
-//									json.put("msg", from.msg);
-//									json.put("time", from.time);
-//									writer.write(json.toString()+"\n");
+							MessageBody from = null;
+							for(int i=0;i<mMsgList.size();i++){
+								if(mMsgList.get(i).machineNo.equals(s)) {
+									from = mMsgList.get(i);
+									System.out.println("send from server : "+from.machineNo);
+								}
+							}
+							
+							for(int i=0;i<mMsgList.size();i++) {
+								if(from.machineNo.equals(s)) {
+									System.out.println("send thread : "+from.machineNo);
+									BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(mMsgList.get(i).mSocket.getOutputStream()));
+									System.out.println("sendstop");
+									writer.write("stop0000\n");
 									writer.flush();
 									break;
-//								}
+								}
 							}
-							mMsgList.remove(0);
+//							mMsgList.remove(0);
 						}
 						Thread.sleep(200);
 					}
@@ -100,7 +105,6 @@ public class MyServer {
 			socketID = count;
 			this.socket = socket;
 			System.out.println("新增一台客户机，socketID：" + socketID);
-//			mActivity.mHandler.sendEmptyMessage(MainActivity.ADD_CLIENT);
 		}
 
 		@Override
@@ -120,7 +124,7 @@ public class MyServer {
 					mb.machineNo = s.substring(0, 3);
 					mb.dataType = Integer.parseInt(s.substring(3, 4));
 					mb.data = Integer.parseInt(s.substring(4, 8));
-
+					mb.mSocket = socket;
 					Message msg = new Message();
 					msg.obj = mb;
 					msg.what = MainActivity.MESSAGE_GET;
@@ -130,11 +134,12 @@ public class MyServer {
 //					sm.from = mb.machineNo;
 //					sm.msg = mb.data+"";
 					mHandler.sendMessage(msg);
-//					mMsgList.add(mb);
+					mMsgList.add(mb);
 
 					if (counter > 30) {
 						counter = 0;
-						System.out.println("write ok");
+						System.out.println("write ok\n");
+						sendStop("111");
 						writer.write("OK");
 						writer.flush();
 					} else {
@@ -165,5 +170,6 @@ public class MyServer {
 		int lineCut;
 		int data;
 		int errortimes;
+		Socket mSocket;
 	}
 }

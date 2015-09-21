@@ -27,7 +27,7 @@
              android:background="@drawable/textbg"
             android:padding="5dp"
             android:layout_marginLeft="10dp"
-            android:src="@drawable/on" />
+             />
     </LinearLayout>
 
     <TextView

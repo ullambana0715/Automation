@@ -7,11 +7,15 @@ import com.android.automation.MyServer.MessageBody;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 public class GridAdapter extends BaseAdapter{
@@ -85,6 +89,30 @@ public class GridAdapter extends BaseAdapter{
 			viewHolder.data.setText("当前速度：0");
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
 		}
+		
+		if(messageBody.get(position).data %2 == 0){
+			viewHolder.runningStatus.setImageResource(R.drawable.on);
+		}else{
+			viewHolder.runningStatus.setImageResource(R.drawable.off);
+		}
+		
+		viewHolder.runningStatus.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				TextView text = new TextView(mActivity);
+				text.setWidth(100);
+				text.setHeight(100);
+				text.setBackgroundColor(Color.WHITE);
+				text.setText("cuowu");
+				PopupWindow pw = new PopupWindow(text);
+				pw.setBackgroundDrawable(new BitmapDrawable());
+				pw.setOutsideTouchable(true);
+				pw.setWidth(100);
+				pw.setHeight(100);
+				pw.showAsDropDown(v);
+			}
+		});
 
 		return convertView;
 	}
@@ -134,6 +162,12 @@ public class GridAdapter extends BaseAdapter{
                 ViewHolder vh = (ViewHolder)view.getTag();
                 vh.data.setText("当前速度："+mb.data);
                 vh.cutTimes.setText("计件数："+mb.lineCut);
+                if(mb.data % 2 == 0){
+                	vh.runningStatus.setImageResource(R.drawable.on);
+        		}else{
+        			vh.runningStatus.setImageResource(R.drawable.off);
+        		}
+
             }
         }
 	}

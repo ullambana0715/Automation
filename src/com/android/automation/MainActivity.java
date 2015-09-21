@@ -245,7 +245,9 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 			}
 			break;
 		case R.id.endserver:
-			server.isStartServer = false;
+			if (server != null) {
+				server.isStartServer = false;
+			}
 			break;
 		}
 	};
