@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,6 +24,8 @@ public class GridAdapter extends BaseAdapter{
 	Context mContext;
 	MainActivity mActivity;
 	List<MessageBody> messageBody = new ArrayList<MyServer.MessageBody>();
+	
+	
 	public GridAdapter(MainActivity ma) {
 		mContext = ma;
 		mActivity = ma;
@@ -60,7 +63,7 @@ public class GridAdapter extends BaseAdapter{
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(int position, View convertView, final ViewGroup parent) {
 		viewHolder = new ViewHolder();
 		if (convertView == null) {
 			convertView = (View)LayoutInflater.from(mContext).inflate(R.layout.items, null);
@@ -78,39 +81,32 @@ public class GridAdapter extends BaseAdapter{
 		
 		if(messageBody.get(position).dataType == 3){
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
+			viewHolder.runningStatus.setImageResource(R.drawable.on);
 		}else if(messageBody.get(position).dataType == 1){
 			viewHolder.data.setText("当前速度："+messageBody.get(position).data);
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
+			viewHolder.runningStatus.setImageResource(R.drawable.on);
 		}else if(messageBody.get(position).dataType == 2){
 			viewHolder.data.setText("当前速度：0");
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
 			System.out.println("当前电压");
-		}else{
+			viewHolder.runningStatus.setImageResource(R.drawable.on);
+		}else if(messageBody.get(position).dataType == 4){
+			viewHolder.runningStatus.setImageResource(R.drawable.off);
 			viewHolder.data.setText("当前速度：0");
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
-		}
-		
-		if(messageBody.get(position).data %2 == 0){
-			viewHolder.runningStatus.setImageResource(R.drawable.on);
-		}else{
-			viewHolder.runningStatus.setImageResource(R.drawable.off);
 		}
 		
 		viewHolder.runningStatus.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				TextView text = new TextView(mActivity);
-				text.setWidth(100);
-				text.setHeight(100);
-				text.setBackgroundColor(Color.WHITE);
-				text.setText("cuowu");
-				PopupWindow pw = new PopupWindow(text);
+				ErrorWindow pw = new ErrorWindow(mActivity);
 				pw.setBackgroundDrawable(new BitmapDrawable());
 				pw.setOutsideTouchable(true);
-				pw.setWidth(100);
-				pw.setHeight(100);
-				pw.showAsDropDown(v);
+				pw.setWidth(mActivity.getWindowManager().getDefaultDisplay().getWidth() - 100);
+				pw.setHeight(mActivity.getWindowManager().getDefaultDisplay().getHeight()-400);
+				pw.showAtLocation(parent, Gravity.CENTER, 10, 100);
 			}
 		});
 
@@ -162,10 +158,10 @@ public class GridAdapter extends BaseAdapter{
                 ViewHolder vh = (ViewHolder)view.getTag();
                 vh.data.setText("当前速度："+mb.data);
                 vh.cutTimes.setText("计件数："+mb.lineCut);
-                if(mb.data % 2 == 0){
-                	vh.runningStatus.setImageResource(R.drawable.on);
+                if(mb.dataType == 4){
+                	vh.runningStatus.setImageResource(R.drawable.off);
         		}else{
-        			vh.runningStatus.setImageResource(R.drawable.off);
+        			vh.runningStatus.setImageResource(R.drawable.on);
         		}
 
             }

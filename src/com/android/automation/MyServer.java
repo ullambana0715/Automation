@@ -18,7 +18,7 @@ public class MyServer {
 	private ServerSocket mServer;
 
 	private ArrayList<MessageBody> mMsgList = new ArrayList<MessageBody>();
-	private ArrayList<SocketThread> mThreadList = new ArrayList<SocketThread>();
+	public ArrayList<SocketThread> mThreadList = new ArrayList<SocketThread>();
 	Handler mHandler;
 	MainActivity mActivity;
 	Socket socket = null;
@@ -72,7 +72,6 @@ public class MyServer {
 									break;
 								}
 							}
-//							mMsgList.remove(0);
 						}
 						Thread.sleep(200);
 					}
@@ -100,11 +99,36 @@ public class MyServer {
 		public BufferedWriter writer;
 		public BufferedReader reader;
 		int counter;
-
+		MessageBody mb = new MessageBody();
 		public SocketThread(Socket socket, int count) {
 			socketID = count;
 			this.socket = socket;
 			System.out.println("新增一台客户机，socketID：" + socketID);
+		}
+		
+		public void sendStop(String s){
+			if(!s.equals(mb.machineNo)){
+				return;
+			}
+			System.out.println("sendstop");
+			try {
+				writer.write("stop0000\n");
+				writer.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		public void sendOk(){
+			System.out.println("write ok\n");
+			try {
+				writer.write("OK");
+				writer.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		@Override
@@ -120,7 +144,7 @@ public class MyServer {
 					s = new String(b);
 //					System.out.println("received : "+s);
 
-					MessageBody mb = new MessageBody();
+					
 					mb.machineNo = s.substring(0, 3);
 					mb.dataType = Integer.parseInt(s.substring(3, 4));
 					mb.data = Integer.parseInt(s.substring(4, 8));
@@ -138,10 +162,8 @@ public class MyServer {
 
 					if (counter > 30) {
 						counter = 0;
-						System.out.println("write ok\n");
-						sendStop("111");
-						writer.write("OK");
-						writer.flush();
+//						sendStop("111");
+						sendOk();
 					} else {
 						counter++;
 //						System.out.println("write pass");
