@@ -81,6 +81,7 @@ public class GridAdapter extends BaseAdapter{
 		
 		if(messageBody.get(position).dataType == 3){
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
+			viewHolder.data.setText("当前速度："+messageBody.get(position).data);
 			viewHolder.runningStatus.setImageResource(R.drawable.on);
 		}else if(messageBody.get(position).dataType == 1){
 			viewHolder.data.setText("当前速度："+messageBody.get(position).data);
@@ -89,7 +90,6 @@ public class GridAdapter extends BaseAdapter{
 		}else if(messageBody.get(position).dataType == 2){
 			viewHolder.data.setText("当前速度：0");
 			viewHolder.cutTimes.setText("计件数："+messageBody.get(position).lineCut);
-			System.out.println("当前电压");
 			viewHolder.runningStatus.setImageResource(R.drawable.on);
 		}else if(messageBody.get(position).dataType == 4){
 			viewHolder.runningStatus.setImageResource(R.drawable.off);

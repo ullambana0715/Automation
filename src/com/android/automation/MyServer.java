@@ -142,8 +142,6 @@ public class MyServer {
 				while (isStartServer) {
 					reader.read(b);
 					s = new String(b);
-//					System.out.println("received : "+s);
-
 					
 					mb.machineNo = s.substring(0, 3);
 					mb.dataType = Integer.parseInt(s.substring(3, 4));
@@ -152,23 +150,14 @@ public class MyServer {
 					Message msg = new Message();
 					msg.obj = mb;
 					msg.what = MainActivity.MESSAGE_GET;
-					
-//					mActivity.mHandler.sendMessage(msg);
-//					SocketMessage sm = new SocketMessage();
-//					sm.from = mb.machineNo;
-//					sm.msg = mb.data+"";
 					mHandler.sendMessage(msg);
 					mMsgList.add(mb);
 
 					if (counter > 30) {
 						counter = 0;
-//						sendStop("111");
 						sendOk();
 					} else {
 						counter++;
-//						System.out.println("write pass");
-//						writer.write("O");
-//						writer.flush();
 					}
 					Thread.sleep(500);
 				}
