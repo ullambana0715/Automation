@@ -156,7 +156,9 @@ public class GridAdapter extends BaseAdapter{
             View view = mActivity.mGridView.getChildAt(position - firstVisiblePosition);
             if(view.getTag() instanceof ViewHolder){
                 ViewHolder vh = (ViewHolder)view.getTag();
-                vh.data.setText("当前速度："+mb.data);
+                if(mb.dataType != 2){
+                    vh.data.setText("当前速度："+mb.data);
+                }
                 vh.cutTimes.setText("计件数："+mb.lineCut);
                 if(mb.dataType == 4){
                 	vh.runningStatus.setImageResource(R.drawable.off);

@@ -123,10 +123,9 @@ public class MyServer {
 		public void sendOk(){
 			System.out.println("write ok\n");
 			try {
-				writer.write("OK");
+				writer.write("OK\n");
 				writer.flush();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

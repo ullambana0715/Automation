@@ -19,8 +19,43 @@ public class MyThread extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		MyThread m = new MyThread("d");
-		m.start();
+//		MyThread m = new MyThread("d");
+//		m.start();
+		for(int a=1;a<9;a++){
+			for(int b=1;b<9;b++){
+				if((a-b)==1){
+					for(int c=1;c<9;c++){
+						for(int d=1;d<9;d++){
+							if(c!=a&&c!=b&&d!=a&&d!=b&&c!=d){
+								if((c-d)==2){
+									for(int e=1;e<9;e++){
+										for(int f=1;f<9;f++){
+											if(e!=a&&e!=b&&e!=c&&e!=d&&f!=a&&f!=b&&f!=c&&f!=d&&e!=f){
+												if((e+f)==9){
+													for(int g=1;g<9;g++){
+														for(int h=1;h<9;h++){
+															if(g!=a&&g!=b&&g!=c&&g!=d&&g!=e&&g!=f&&h!=a&&h!=b&&h!=c&&h!=d&&h!=e&&g!=f&&g!=h){
+																if((g+h)==7){
+																	System.out.println(a+"-"+b+"=1");
+																	System.out.println(c+"-"+d+"=2");
+																	System.out.println(e+"+"+f+"=9");
+																	System.out.println(g+"+"+h+"=7");
+																	System.out.println("==========");
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override

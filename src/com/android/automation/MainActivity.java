@@ -172,6 +172,7 @@ public class MainActivity extends Activity implements OnClickListener, OnChartVa
 		mStartServer = (TextView) main.findViewById(R.id.startserver);
 		mEndServer = (TextView) main.findViewById(R.id.endserver);
 		mTotal = (TextView) main.findViewById(R.id.totalmachine);
+		mTotal.setText("当前有0台机器连接");
 		mGridView = (GridView) main.findViewById(R.id.grid);
 
 		mGridView.setAdapter(mGridAdapter);
